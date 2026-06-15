@@ -1,193 +1,56 @@
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-
+import { useDispatch, useSelector } from 'react-redux';
 import {
- addItem,
- removeItem,
- deleteItem,
- clearCart
-} from "../Cart/CartSlice";
-
-
-function Cart(){
-
-const dispatch = useDispatch();
-const navigate = useNavigate();
-
-const cartItems =
-useSelector(state=>state.cart.items);
-
-
-const total = cartItems.reduce(
-(sum,item)=>sum+item.price*item.quantity,
-0
-);
-
-
-return(
-
-<section className="cart-page">
-
-
-<div className="cart-top">
-
-<h1>
-Shopping Bag
-</h1>
-
-
-<button
-onClick={()=>navigate("/")}
->
-Continue Shopping
-</button>
-
-</div>
-
-
-
-{
-cartItems.length===0 ?
-
-<div className="empty">
-
-<h2>Your bag is empty</h2>
-
-</div>
-
-
-:
-
-<>
-
-
-<div className="cart-list">
-
-
-{
-
-cartItems.map(item=>(
-
-
-<div
-className="cart-product"
-key={item.id}
->
-
-
-<img src={item.image}/>
-
-
-
-<div className="cart-info">
-
-<h2>
-{item.name}
-</h2>
-
-
-<p>
-₹{item.price}
-</p>
-
-
-
-<div className="quantity">
-
-
-<button
-onClick={()=>dispatch(removeItem(item.id))}
->
--
-</button>
-
-
-<span>
-{item.quantity}
-</span>
-
-
-<button
-onClick={()=>dispatch(addItem(item))}
->
-+
-</button>
-
-
-</div>
-
-</div>
-
-
-
-<h3>
-
-₹{item.price*item.quantity}
-
-</h3>
-
-
-<button
-className="remove"
-onClick={()=>dispatch(deleteItem(item.id))}
->
-
-✕
-
-</button>
-
-
-
-</div>
-
-
-))
-
+  removeItem,
+  clearCart,
+  selectCartItems,
+  selectCartTotal,
+  selectCartCount
+} from "./CartSlice";
+function Cart() {
+ const dispatch = useDispatch();
+ const items = useSelector(selectCartItems);
+ const total = useSelector(selectCartTotal);
+ const count = useSelector(selectCartCount);
+ return (
+ <div className="cart">
+ <div className="cart-header">
+ <span className="cart-icon"> </span>
+ <h2 className="cart-title">Cart</h2>
+ {count > 0 && <span className="cart-badge">{count}</span>}
+ </div>
+ {items.length === 0 ? (
+ <p className="cart-empty">Your cart is empty. Add some vegetables!</p>
+ ) : (
+ <>
+ <ul className="cart-list">
+ {items.map((item) => (
+ <li key={item.id} className="cart-item">
+ <span className="cart-item-emoji">{item.emoji}</span>
+ <span className="cart-item-name">{item.name}</span>
+ {item.qty > 1 && <span className="cart-item-qty">× {item.qty}</span>}
+ <span className="cart-item-price">₹{item.price * item.qty}</span>
+ <button
+ className="btn-remove"
+ onClick={() => dispatch(removeItem(item.id))}
+ aria-label={`Remove ${item.name}`}
+ >
+ ✕
+ </button>
+ </li>
+ ))}
+ </ul>
+ <div className="cart-footer">
+ <div className="cart-total">
+ <span>Total :</span>
+ <strong>Rs.{total}</strong>
+ </div>
+ <button className="btn-clear" onClick={() => dispatch(clearCart())}>
+ Clear Cart
+ </button>
+ </div>
+ </>
+ )}
+ </div>
+ );
 }
-
-
-</div>
-
-
-
-
-<div className="checkout">
-
-
-<h2>
-Total ₹{total}
-</h2>
-
-
-<button>
-Checkout
-</button>
-
-
-<button
-className="clear"
-onClick={()=>dispatch(clearCart())}
->
-
-Clear Cart
-
-</button>
-
-
-</div>
-
-
-</>
-
-
-}
-
-
-</section>
-
-)
-
-}
-
-
 export default Cart;
